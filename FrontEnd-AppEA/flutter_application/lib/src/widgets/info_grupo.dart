@@ -48,7 +48,7 @@ class InfoGrupo extends StatelessWidget {
                   ],
                 ),
               )),
-              Participantes(context),
+              Participantes(),
             ],
           ),
           Row(

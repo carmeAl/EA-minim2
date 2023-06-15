@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/infrastructure/models/user.dart';
+import '../../repositories/inBox_repository.dart';
+import '../../repositories/inBox_repository_impl.dart';
 import '../../utils/constants.dart';
 
 import 'package:get/get.dart';
@@ -26,6 +28,7 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget>{
+    final InBoxRespository _inBoxRespository=InBoxRespositoryImpl();
 
   late User user;
   late int indiceAleatorio;
@@ -77,6 +80,13 @@ class _DrawerWidgetState extends State<DrawerWidget>{
                         title: Text('FAQS'.tr),
                         onTap: () {
                           Navigator.pushNamed(context, '/faqs_screen');
+                        }),
+                        ListTile(
+                        leading: const Icon(Icons.email),
+                        title: Text('InBox'),
+                        onTap: () async {
+                          Constants.listInBox= await _inBoxRespository.recibeInBox(Constants.user.id);
+                          Navigator.pushNamed(context, '/recibedInBox_screen');
                         }),
                     ListTile(
                         leading: const Icon(Icons.play_circle),

@@ -6,8 +6,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:label_marker/label_marker.dart';
 
 import '../infrastructure/models/grupo.dart';
+import '../infrastructure/models/in_box.dart';
 import '../infrastructure/models/ticket.dart';
 import '../infrastructure/models/user.dart';
+import '../repositories/inBox_repository.dart';
+import '../repositories/inBox_repository_impl.dart';
 
 abstract class Constants{
   static String apiUrl = "http://${dotenv.env['IP_DEVICE']}";
@@ -22,6 +25,8 @@ abstract class Constants{
   static Set<Marker>  markers ={};
   static String idTicketSeleccionado="";
 
+  static User userEnviarMsn=User(id: "", name: "name", surname: "surname", email: "email", password: "password", role: "role", isEnabled: true, createdAt: DateTime.parse("2023-05-09T06:54:07.810+00:00"), updatedAt: DateTime.parse("2023-05-09T06:54:07.810+00:00"));
+  static List<InBox> listInBox =[]; 
 
   static List<Ticket> listTickets=<Ticket>[];
 

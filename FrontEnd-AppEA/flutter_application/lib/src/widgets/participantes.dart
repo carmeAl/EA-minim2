@@ -5,9 +5,18 @@ import '../../infrastructure/models/grupo_populate.dart';
 import '../../infrastructure/models/ticket.dart';
 import 'package:get/get.dart';
 
-class Participantes extends StatelessWidget {
+import '../../infrastructure/models/user.dart';
+
+class Participantes extends StatefulWidget {
+  const Participantes({super.key});
+
+  @override
+  ParticipantesState createState() => ParticipantesState();
+}
+
+class ParticipantesState extends State<Participantes> {
   final GrupoPopulate grupoPopulate = Constants.grupoPopulate;
-  Participantes(BuildContext context, {super.key});
+  List<User> userList = Constants.grupoPopulate.users;
 
   @override
   Widget build(BuildContext context) {
@@ -19,36 +28,54 @@ class Participantes extends StatelessWidget {
             fontFamily: 'NerkoOne',
             fontSize: 20.0,
           )),
-      onPressed: () async {
+      onPressed: () {
         showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text('participantes'.tr),
-                content: Card(
-                    color: const Color.fromARGB(255, 197, 162, 226),
-                    child: GestureDetector(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: grupoPopulate.users
-                            .map((user) => ListTile(
-                                  title: Text('${user.name} ${user.surname}'),
-                                  trailing: Icon(
-                                    Icons.check_box,
-                                    color: isUserComplete(user.id),
-                                  ),
-                                ))
-                            .toList(),
-                      ),
-                      onTap: () async {
-                        //await _grupoRepository.getPopulateGrupo(grupoList[index].id);
+                content: Container(
+                  height: 300.0, // Change as per your requirement
+                  width: 300.0, // Change as per your requirement
+                  child: userList.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: userList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _participante(context, index,
+                                userList); //llamamos funcion widget _grupo
+                          })
+                      : Text('aviso_noGrupos'.tr,
+                          style: const TextStyle(
+                              fontSize: 20.0, color: Colors.white)),
+                ),
 
-                        //Navigator.pushNamed(context, '/list_ticket_screen');
-                      },
-                    )),
+                //Card(
+                //     color: const Color.fromARGB(255, 197, 162, 226),
+                //     child: GestureDetector(
+                //       child: Column(
+                //         mainAxisSize: MainAxisSize.min,
+                //         children: grupoPopulate.users
+                //             .map((user) => ListTile(
+                //                   title: Text('${user.name} ${user.surname}'),
+                //                   trailing: Icon(
+                //                     Icons.check_box,
+                //                     color: isUserComplete(user.id),
+                //                   ),
+                //                 ))
+                //             .toList(),
+                //       ),
+                //       onTap: () {
+                //         Navigator.pushNamed(context, '/sendInBox_screen');
+                //         Constants.userEnviarMsn=user
+
+                //         //await _grupoRepository.getPopulateGrupo(grupoList[index].id);
+
+                //         //Navigator.pushNamed(context, '/list_ticket_screen');
+                //       },
+                //     )),
                 actions: <Widget>[
                   TextButton(
-                    child:Text('cerrar'.tr),
+                    child: Text('cerrar'.tr),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -86,5 +113,25 @@ class Participantes extends StatelessWidget {
       return Colors.grey;
     }
     return Colors.green;
+  }
+
+  Widget _participante(BuildContext context, int index, List<User> userList) {
+    return Card(
+      color: const Color.fromARGB(255, 197, 162, 226),
+      child: Padding(
+          padding: const EdgeInsets.all(14.0),
+          child: ListTile(
+            onTap: () {
+              Navigator.pushNamed(context, '/sendInBox_screen');
+                Constants.userEnviarMsn=userList[index];
+            },
+            title: Text("${userList[index].name} ${userList[index].surname}",
+                style: const TextStyle(fontSize: 30.0)),
+            trailing: Icon(
+              Icons.check_box,
+              color: isUserComplete(userList[index].id),
+            ),
+          )),
+    );
   }
 }

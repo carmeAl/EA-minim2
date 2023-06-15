@@ -6,11 +6,14 @@ import 'package:flutter_application/utils/auth_services.dart';
 
 import 'package:flutter_application/src/controllers/language_controller.dart';
 import 'package:flutter_application/src/register_screen.dart';
+import 'package:flutter_application/utils/constants.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 
 import '../blocs/user/user_bloc.dart';
+import '../repositories/inBox_repository.dart';
+import '../repositories/inBox_repository_impl.dart';
 import '../repositories/user_repository.dart';
 import '../repositories/user_repository_impl.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +36,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final UserRespository _userRepository = UserRepositoryImpl();
+
 
   late String idUser = "";
   final passwordController = TextEditingController();
@@ -66,6 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
             password,
           );
           await _userRepository.getGruposOfUser();
+          
           Navigator.pushNamed(
               context, '/list_grupo_screen');
         } on LoginUser {

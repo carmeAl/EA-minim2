@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/infrastructure/models/in_box.dart';
+import 'package:flutter_application/repositories/inBox_repository.dart';
+import 'package:flutter_application/repositories/inBox_repository_impl.dart';
+import 'package:flutter_application/utils/constants.dart';
 import '../repositories/grupo_repository.dart';
 import '../repositories/grupo_repository_impl.dart';
-import '../repositories/inBox_repository.dart';
 import '../repositories/user_repository.dart';
 import '../repositories/user_repository_impl.dart';
 import 'list_grupo_screen.dart';
 
 import 'package:get/get.dart';
 
-class CrearGrupoScreen extends StatefulWidget {
-  const CrearGrupoScreen({super.key});
+class SendInBoxScreen extends StatefulWidget {
+  const SendInBoxScreen({super.key});
 
   @override
-  CrearGrupoScreenState createState() => CrearGrupoScreenState();
+  SendInBoxScreenState createState() => SendInBoxScreenState();
 }
 
-class CrearGrupoScreenState extends State<CrearGrupoScreen> {
-  final nameController = TextEditingController();
+class SendInBoxScreenState extends State<SendInBoxScreen> {
+  final asuntoController = TextEditingController();
   final descriptionController = TextEditingController();
   bool _showErrorMessage = false;
-  final GrupoRespository _grupoRepository = GrupoRepositoryImpl();
+  final InBoxRespository _inBoxRepository = InBoxRespositoryImpl();
   final UserRespository _userRepository = UserRepositoryImpl();
 
   @override
@@ -28,7 +31,7 @@ class CrearGrupoScreenState extends State<CrearGrupoScreen> {
         backgroundColor: const Color.fromARGB(255, 228, 226, 221),
         appBar: AppBar(
           centerTitle: true,
-          title: Text('nuevo_grupo'.tr,
+          title: Text("Envia un msn a : ${Constants.userEnviarMsn.name}",
               style: TextStyle(
                   fontFamily: 'aBlackLives',
                   fontSize: 30.0,
@@ -54,9 +57,8 @@ class CrearGrupoScreenState extends State<CrearGrupoScreen> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('crear_grupo'.tr),
-                      content: Text(
-                          'btn_ayuda_crearGrupos'.tr),
+                      title: Text('Enviar msn'),
+                      content: Text('btn_ayuda_enviarMSN'),
                       actions: [
                         TextButton(
                           child: Text('cerrar'.tr),
@@ -82,9 +84,9 @@ class CrearGrupoScreenState extends State<CrearGrupoScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       TextFormField(
-                        controller: nameController,
+                        controller: asuntoController,
                         decoration: InputDecoration(
-                          labelText: 'nombre_grupo'.tr,
+                          labelText: 'Asunto MSN',
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20.0)),
                           errorStyle: const TextStyle(color: Colors.red),
@@ -93,7 +95,7 @@ class CrearGrupoScreenState extends State<CrearGrupoScreen> {
                         ),
                         validator: (value) {
                           if (value == "" || value == null) {
-                            return 'Porfavor introduce un nombre de grupo';
+                            return 'Porfavor introduce un asunto de MSN';
                           }
                           return null;
                         },
@@ -121,12 +123,12 @@ class CrearGrupoScreenState extends State<CrearGrupoScreen> {
                         controller: descriptionController,
                         keyboardType: TextInputType.multiline,
                         decoration: InputDecoration(
-                            labelText: 'descripcion_grupo'.tr,
+                            labelText: 'Inserte MSN',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0))),
                         validator: (value) {
                           if (value == "" || value == null) {
-                            return 'Porfavor introduce la descripción de grupo';
+                            return 'Porfavor introduzca un MSN';
                           }
                           return null;
                         },
@@ -135,7 +137,6 @@ class CrearGrupoScreenState extends State<CrearGrupoScreen> {
                         height: 18.0,
                       ),
                     ]),
-  
                 SizedBox(
                   width: double.infinity,
                   child: TextButton(
@@ -148,34 +149,37 @@ class CrearGrupoScreenState extends State<CrearGrupoScreen> {
                           fontSize: 30.0,
                         )),
                     onPressed: () async {
-                      if (nameController.text == "" ||
-                          nameController.text == "") {
+                      if (asuntoController.text == "" ||
+                          asuntoController.text == "") {
                         setState(() {
                           _showErrorMessage = true;
                         });
                         return;
                       }
                       try {
-                        bool response = await _grupoRepository.crearGrupo(
-                            nameController.text, descriptionController.text);
-                        await _userRepository.getGruposOfUser();
+                        var inBox = {
+                          "idUsuarioOrigen": Constants.user.id,
+                          "idUsuarioDestino": Constants.userEnviarMsn.id,
+                          "asunto": asuntoController.text,
+                          "msn": descriptionController.text
+                        };
+                        var response = await _inBoxRepository.sendInBox(inBox);
 
-                        if (response) {
-                          Navigator.pushNamed(context, '/list_grupo_screen');
-                        } else {
-                          Future.delayed(Duration.zero, () {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content:
-                                  Text('control_añadirGrupo'.tr),
-                              backgroundColor: Theme.of(context).primaryColor,
-                            ));
-                          });
-                        }
+                        // if (response) {
+                        //   Navigator.pushNamed(context, '/list_grupo_screen');
+                        // } else {
+                        //   Future.delayed(Duration.zero, () {
+                        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        //       content: Text('control_añadirGrupo'.tr),
+                        //       backgroundColor: Theme.of(context).primaryColor,
+                        //     ));
+                        //   });
+                        // }
                       } catch (e) {
                         print(e);
                       }
                     },
-                    child: Text('crear_grupo'.tr),
+                    child: Text('Enviar MSN'),
                   ),
                 ),
               ],
