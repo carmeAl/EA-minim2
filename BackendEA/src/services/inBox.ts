@@ -8,7 +8,7 @@ const createInBox = async (item: InBox) => {
     return responseInsert;
 };
 const getInBoxOfUser = async (idUser: string) => {
-    const inBoxUser = await InBoxModel.find({ idUsuarioDestino: idUser });
+    const inBoxUser = await InBoxModel.find({ idUsuarioDestino: idUser }).populate('idUsuarioOrigen');
     return inBoxUser;
 }
 

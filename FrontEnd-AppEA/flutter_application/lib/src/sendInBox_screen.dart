@@ -3,6 +3,7 @@ import 'package:flutter_application/infrastructure/models/in_box.dart';
 import 'package:flutter_application/repositories/inBox_repository.dart';
 import 'package:flutter_application/repositories/inBox_repository_impl.dart';
 import 'package:flutter_application/utils/constants.dart';
+import 'package:loading_icon_button/loading_icon_button.dart';
 import '../repositories/grupo_repository.dart';
 import '../repositories/grupo_repository_impl.dart';
 import '../repositories/user_repository.dart';
@@ -24,6 +25,7 @@ class SendInBoxScreenState extends State<SendInBoxScreen> {
   bool _showErrorMessage = false;
   final InBoxRespository _inBoxRepository = InBoxRespositoryImpl();
   final UserRespository _userRepository = UserRepositoryImpl();
+  final LoadingButtonController _btnController = LoadingButtonController();
 
   @override
   Widget build(BuildContext context) {
@@ -137,54 +139,51 @@ class SendInBoxScreenState extends State<SendInBoxScreen> {
                         height: 18.0,
                       ),
                     ]),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor:
-                            const Color.fromRGBO(128, 119, 119, 0.973),
-                        textStyle: const TextStyle(
-                          fontFamily: 'NerkoOne',
-                          fontSize: 30.0,
-                        )),
-                    onPressed: () async {
-                      if (asuntoController.text == "" ||
-                          asuntoController.text == "") {
-                        setState(() {
-                          _showErrorMessage = true;
-                        });
-                        return;
-                      }
-                      try {
-                        var inBox = {
-                          "idUsuarioOrigen": Constants.user.id,
-                          "idUsuarioDestino": Constants.userEnviarMsn.id,
-                          "asunto": asuntoController.text,
-                          "msn": descriptionController.text
-                        };
-                        var response = await _inBoxRepository.sendInBox(inBox);
+                LoadingButton(
+                  iconData: Icons.send,
+                  onPressed: () async {
+                    if (asuntoController.text == "" ||
+                        asuntoController.text == "") {
+                      setState(() {
+                        _showErrorMessage = true;
+                      });
+                      buttonActualizarUnidadesPressed(false);
+                      return;
+                    }
 
-                        // if (response) {
-                        //   Navigator.pushNamed(context, '/list_grupo_screen');
-                        // } else {
-                        //   Future.delayed(Duration.zero, () {
-                        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        //       content: Text('control_añadirGrupo'.tr),
-                        //       backgroundColor: Theme.of(context).primaryColor,
-                        //     ));
-                        //   });
-                        // }
-                      } catch (e) {
-                        print(e);
-                      }
-                    },
-                    child: Text('Enviar MSN'),
-                  ),
-                ),
+                    try {
+                      var inBox = {
+                        "idUsuarioOrigen": Constants.user.id,
+                        "idUsuarioDestino": Constants.userEnviarMsn.id,
+                        "asunto": asuntoController.text,
+                        "msn": descriptionController.text
+                      };
+                      var response = await _inBoxRepository.sendInBox(inBox);
+                      buttonActualizarUnidadesPressed(true);
+                    } catch (e) {
+                      buttonActualizarUnidadesPressed(false);
+                      print(e);
+                    }
+                  },
+                  controller: _btnController,
+                  child: Text('Enviar MSN'),
+                )
               ],
             ),
           ],
         ));
+  }
+
+  void buttonActualizarUnidadesPressed(bool funciona) async {
+    Future.delayed(const Duration(seconds: 1), () {
+      if (funciona) {
+        _btnController.success();
+      } else {
+        _btnController.error();
+      }
+      Future.delayed(const Duration(seconds: 1), () {
+        _btnController.reset();
+      });
+    });
   }
 }
